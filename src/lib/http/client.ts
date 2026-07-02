@@ -1,3 +1,9 @@
+import axios, {
+  AxiosError,
+  AxiosHeaders,
+  type AxiosInstance,
+  type AxiosRequestConfig,
+} from "axios";
 import { env } from "@/lib/env";
 import { ApiError, type ApiErrorPayload } from "./api-error";
 
@@ -8,35 +14,45 @@ interface RequestOptions {
   body?: unknown;
   signal?: AbortSignal;
   query?: Record<string, string | number | boolean | undefined | null>;
+  timeoutMs?: number;
 }
 
-function buildUrl(path: string, query?: RequestOptions["query"]): string {
-  const base = env.NEXT_PUBLIC_API_BASE_URL.replace(/\/$/, "");
-  const url = new URL(`${base}${path.startsWith("/") ? path : `/${path}`}`);
-  if (query) {
-    for (const [key, value] of Object.entries(query)) {
-      if (value === undefined || value === null) continue;
-      url.searchParams.set(key, String(value));
-    }
+const DEFAULT_TIMEOUT_MS = 60_000;
+
+function pruneQuery(
+  query?: RequestOptions["query"],
+): Record<string, string> | undefined {
+  if (!query) return undefined;
+  const out: Record<string, string> = {};
+  for (const [key, value] of Object.entries(query)) {
+    if (value === undefined || value === null || value === "") continue;
+    out[key] = String(value);
   }
-  return url.toString();
+  return Object.keys(out).length ? out : undefined;
 }
 
-async function parseError(response: Response): Promise<ApiError> {
-  let payload: { error?: ApiErrorPayload } | null = null;
-  try {
-    payload = (await response.json()) as { error?: ApiErrorPayload };
-  } catch {
-    // response body was not JSON — fall through
-  }
+const axiosClient: AxiosInstance = axios.create({
+  baseURL: env.NEXT_PUBLIC_API_BASE_URL.replace(/\/$/, ""),
+  timeout: DEFAULT_TIMEOUT_MS,
+  headers: { Accept: "application/json" },
+});
 
-  const err = payload?.error;
+function toApiError(err: AxiosError): ApiError {
+  if (err.response) {
+    const payload = err.response.data as { error?: ApiErrorPayload } | null;
+    const body = payload?.error;
+    return new ApiError({
+      status: err.response.status,
+      code: body?.code ?? "UNKNOWN",
+      message: body?.message ?? err.response.statusText ?? "Request failed",
+      requestId: body?.requestId,
+      details: body?.details,
+    });
+  }
   return new ApiError({
-    status: response.status,
-    code: err?.code ?? "UNKNOWN",
-    message: err?.message ?? response.statusText ?? "Request failed",
-    requestId: err?.requestId,
-    details: err?.details,
+    status: 0,
+    code: "NETWORK_ERROR",
+    message: "Falha de rede. Verifique se a API está acessível.",
   });
 }
 
@@ -44,42 +60,43 @@ export async function apiRequest<TResponse>(
   path: string,
   options: RequestOptions = {},
 ): Promise<TResponse> {
-  const { method = "GET", body, signal, query } = options;
+  const { method = "GET", body, signal, query, timeoutMs } = options;
 
-  const headers: Record<string, string> = { Accept: "application/json" };
+  const config: AxiosRequestConfig = {
+    url: path.startsWith("/") ? path : `/${path}`,
+    method,
+    params: pruneQuery(query),
+    data: body,
+    signal,
+    timeout: timeoutMs ?? DEFAULT_TIMEOUT_MS,
+    headers: new AxiosHeaders(),
+  };
+
   if (body !== undefined) {
-    headers["Content-Type"] = "application/json";
+    (config.headers as AxiosHeaders).set("Content-Type", "application/json");
   }
 
-  let response: Response;
   try {
-    response = await fetch(buildUrl(path, query), {
-      method,
-      headers,
-      body: body === undefined ? undefined : JSON.stringify(body),
-      signal,
-      cache: "no-store",
-    });
+    const response = await axiosClient.request<TResponse>(config);
+    if (response.status === 204) return undefined as TResponse;
+    return response.data as TResponse;
   } catch (cause) {
-    if (cause instanceof DOMException && cause.name === "AbortError") {
+    if (axios.isCancel(cause)) throw cause;
+    if (
+      cause instanceof DOMException &&
+      (cause.name === "AbortError" || cause.name === "CanceledError")
+    ) {
       throw cause;
+    }
+    if (axios.isAxiosError(cause)) {
+      throw toApiError(cause);
     }
     throw new ApiError({
       status: 0,
-      code: "NETWORK_ERROR",
-      message: "Falha de rede. Verifique se a API está acessível.",
+      code: "UNKNOWN",
+      message: cause instanceof Error ? cause.message : "Erro desconhecido.",
     });
   }
-
-  if (response.status === 204) {
-    return undefined as TResponse;
-  }
-
-  if (!response.ok) {
-    throw await parseError(response);
-  }
-
-  return (await response.json()) as TResponse;
 }
 
 export const api = {

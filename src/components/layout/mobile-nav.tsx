@@ -33,18 +33,21 @@ export function MobileNav() {
           <Menu className="h-5 w-5" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="left">
+      <SheetContent
+        side="left"
+        className="border-sidebar-border bg-sidebar text-sidebar-foreground"
+      >
         <div className="pt-1">
-          <Brand />
+          <Brand className="text-sidebar-foreground" />
         </div>
         <SheetTitle className="sr-only">Navegação</SheetTitle>
         <SheetDescription className="sr-only">
           Navegue entre as seções do painel.
         </SheetDescription>
-        <p className="pt-4 text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
+        <p className="pt-4 text-[11px] font-semibold uppercase tracking-widest text-sidebar-muted">
           Operação
         </p>
-        <nav aria-label="Navegação principal" className="flex flex-col gap-px">
+        <nav aria-label="Navegação principal" className="flex flex-col gap-1">
           {primaryNav.map((item) => {
             const isActive =
               item.matchMode === "prefix"
@@ -57,10 +60,10 @@ export function MobileNav() {
                 onClick={() => setOpen(false)}
                 aria-current={isActive ? "page" : undefined}
                 className={cn(
-                  "flex h-9 items-center rounded-sm px-2 text-sm transition-colors",
+                  "flex h-9 items-center rounded-md px-3 text-sm transition-colors",
                   isActive
-                    ? "font-medium text-foreground"
-                    : "text-muted-foreground hover:text-foreground",
+                    ? "bg-sidebar-accent font-medium text-sidebar-foreground"
+                    : "text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground",
                 )}
               >
                 {item.title}
@@ -68,11 +71,11 @@ export function MobileNav() {
             );
           })}
         </nav>
-        <div className="mt-auto">
-          <p className="text-xs font-medium text-foreground">
+        <div className="mt-auto rounded-md border border-sidebar-border bg-sidebar-accent/60 p-3">
+          <p className="text-xs font-medium text-sidebar-foreground">
             {siteConfig.tenantLabel}
           </p>
-          <p className="text-[11px] text-muted-foreground">
+          <p className="mt-0.5 text-[11px] text-sidebar-muted">
             Ambiente de operação
           </p>
         </div>

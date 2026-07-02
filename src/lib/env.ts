@@ -1,9 +1,16 @@
 import { z } from "zod";
 
+const isAbsoluteHttp = (v: string) => /^https?:\/\//i.test(v);
+const isRelativePath = (v: string) => v.startsWith("/");
+
 const envSchema = z.object({
   NEXT_PUBLIC_API_BASE_URL: z
     .string()
-    .url("NEXT_PUBLIC_API_BASE_URL must be a valid URL"),
+    .min(1, "NEXT_PUBLIC_API_BASE_URL is required")
+    .refine(
+      (v) => isAbsoluteHttp(v) || isRelativePath(v),
+      "NEXT_PUBLIC_API_BASE_URL must be an absolute URL (http/https) or a relative path (starting with '/').",
+    ),
 });
 
 const parsed = envSchema.safeParse({

@@ -28,11 +28,12 @@ export function PageHeader({
       <div className="space-y-2">
         {breadcrumbs}
         {eyebrow && (
-          <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
+          <p className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-primary">
+            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
             {eyebrow}
           </p>
         )}
-        <h1 className="text-[26px] font-semibold leading-tight tracking-tight">
+        <h1 className="font-display text-3xl font-semibold leading-tight tracking-tight text-foreground md:text-[32px]">
           {title}
         </h1>
         {description && (

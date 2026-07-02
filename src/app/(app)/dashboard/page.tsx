@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ArrowRight, CalendarClock, FileText } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { KpiCard } from "@/components/shared/kpi-card";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -30,16 +31,20 @@ export default function DashboardPage() {
 
       <section
         aria-label="Indicadores"
-        className="grid grid-cols-1 gap-y-8 border-y border-[hsl(var(--hairline))] py-8 sm:grid-cols-2"
+        className="grid grid-cols-1 gap-4 sm:grid-cols-2"
       >
         <KpiCard
           label="Apólices na base"
           value={totalPolicies}
+          icon={<FileText />}
+          accent="primary"
           loading={list.isLoading}
         />
         <KpiCard
           label="Vencendo em 30 dias"
           value={expiringCount}
+          icon={<CalendarClock />}
+          accent="warning"
           hint={
             expiring.data?.meta.reference
               ? `Ref. ${formatISODate(expiring.data.meta.reference)}`
@@ -49,11 +54,11 @@ export default function DashboardPage() {
         />
       </section>
 
-      <section className="grid grid-cols-1 gap-10 lg:grid-cols-2">
-        <div>
+      <section className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div className="rounded-xl border border-border/70 bg-card p-6 shadow-soft">
           <div className="mb-4 flex items-baseline justify-between">
             <div>
-              <h2 className="text-sm font-semibold tracking-tight">
+              <h2 className="font-display text-base font-semibold tracking-tight">
                 Apólices recentes
               </h2>
               <p className="text-xs text-muted-foreground">
@@ -62,12 +67,13 @@ export default function DashboardPage() {
             </div>
             <Link
               href="/policies"
-              className="text-xs font-medium text-foreground underline-offset-4 hover:underline"
+              className="inline-flex items-center gap-1 text-xs font-medium text-primary transition-colors hover:text-primary/80"
             >
               Ver todas
+              <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
-          <div className="divide-y divide-[hsl(var(--hairline))]">
+          <div className="divide-y divide-hairline">
             {list.isLoading ? (
               Array.from({ length: 3 }).map((_, i) => (
                 <div key={i} className="py-3">
@@ -81,7 +87,7 @@ export default function DashboardPage() {
                 title="Nenhuma apólice cadastrada"
                 description="Comece cadastrando a primeira apólice."
                 action={
-                  <Button asChild size="sm">
+                  <Button asChild size="sm" variant="brand">
                     <Link href="/policies/new">Cadastrar apólice</Link>
                   </Button>
                 }
@@ -91,10 +97,10 @@ export default function DashboardPage() {
                 <Link
                   key={policy.id}
                   href={`/policies/${policy.id}`}
-                  className="flex items-center justify-between py-3 transition-colors hover:text-foreground"
+                  className="flex items-center justify-between rounded-md px-2 py-3 -mx-2 transition-colors hover:bg-muted/50"
                 >
                   <div className="min-w-0">
-                    <p className="font-mono text-sm font-medium tabular-nums text-foreground">
+                    <p className="font-mono text-sm font-semibold tabular-nums text-foreground">
                       {policy.number}
                     </p>
                     <p className="text-xs text-muted-foreground">
@@ -110,10 +116,10 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div>
+        <div className="rounded-xl border border-border/70 bg-card p-6 shadow-soft">
           <div className="mb-4 flex items-baseline justify-between">
             <div>
-              <h2 className="text-sm font-semibold tracking-tight">
+              <h2 className="font-display text-base font-semibold tracking-tight">
                 Próximos vencimentos
               </h2>
               <p className="text-xs text-muted-foreground">
@@ -122,12 +128,13 @@ export default function DashboardPage() {
             </div>
             <Link
               href="/expiring"
-              className="text-xs font-medium text-foreground underline-offset-4 hover:underline"
+              className="inline-flex items-center gap-1 text-xs font-medium text-primary transition-colors hover:text-primary/80"
             >
               Detalhar
+              <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
-          <div className="divide-y divide-[hsl(var(--hairline))]">
+          <div className="divide-y divide-hairline">
             {expiring.isLoading ? (
               Array.from({ length: 3 }).map((_, i) => (
                 <div key={i} className="py-3">
@@ -149,10 +156,10 @@ export default function DashboardPage() {
                 <Link
                   key={policy.id}
                   href={`/policies/${policy.id}`}
-                  className="flex items-center justify-between py-3 transition-colors hover:text-foreground"
+                  className="flex items-center justify-between rounded-md px-2 py-3 -mx-2 transition-colors hover:bg-muted/50"
                 >
                   <div className="min-w-0">
-                    <p className="font-mono text-sm font-medium tabular-nums text-foreground">
+                    <p className="font-mono text-sm font-semibold tabular-nums text-foreground">
                       {policy.number}
                     </p>
                     <p className="text-xs text-muted-foreground">
