@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { policiesApi } from "@/features/policies/api/policies-api";
 import { policyKeys } from "./query-keys";
-import { ApiError } from "@/lib/http/api-error";
+import { apiErrorMessage } from "@/lib/http/error-messages";
 
 export function useDeletePolicy() {
   const qc = useQueryClient();
@@ -17,11 +17,9 @@ export function useDeletePolicy() {
       toast.success("Apólice excluída");
     },
     onError: (error) => {
-      const message =
-        error instanceof ApiError
-          ? error.message
-          : "Não foi possível excluir a apólice.";
-      toast.error("Erro ao excluir apólice", { description: message });
+      toast.error("Erro ao excluir apólice", {
+        description: apiErrorMessage(error, "Não foi possível excluir a apólice."),
+      });
     },
   });
 }

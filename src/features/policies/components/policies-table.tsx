@@ -36,7 +36,7 @@ export function PoliciesTable({ policies, onDelete }: PoliciesTableProps) {
   return (
     <Table>
       <TableHeader>
-        <TableRow>
+        <TableRow className="bg-muted/50 hover:bg-muted/50">
           <TableHead>Número</TableHead>
           <TableHead>Segurado</TableHead>
           <TableHead>Placa</TableHead>

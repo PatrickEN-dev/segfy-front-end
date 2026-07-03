@@ -60,7 +60,7 @@ function ListCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-md border border-border bg-card p-6">
+    <div className="rounded-xl border border-border bg-card p-6">
       <div className="mb-4 flex items-baseline justify-between gap-3">
         <div>
           <h2 className="text-sm font-semibold tracking-tight">{title}</h2>
@@ -125,6 +125,12 @@ export default function DashboardPage() {
         }
       />
 
+      <div
+        className={cn(
+          "space-y-8 transition-opacity duration-300",
+          summary.isFetching && !summary.isLoading && "opacity-70",
+        )}
+      >
       <section
         aria-label="Indicadores"
         className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4"
@@ -133,6 +139,9 @@ export default function DashboardPage() {
           label="Apólices na base"
           value={totals?.policies ?? 0}
           icon={<FileText aria-hidden />}
+          tone="primary"
+          href="/policies"
+          index={0}
           hint={
             totals
               ? `${totals.cancelled} canceladas · ${totals.expired} expiradas`
@@ -144,6 +153,9 @@ export default function DashboardPage() {
           label="Apólices ativas"
           value={totals?.active ?? 0}
           icon={<ShieldCheck aria-hidden />}
+          tone="success"
+          href="/policies?status=Ativa"
+          index={1}
           hint={
             activeShare !== null
               ? `${percent.format(activeShare)} da base`
@@ -155,6 +167,9 @@ export default function DashboardPage() {
           label="Vencendo em 30 dias"
           value={data?.expiring.count ?? 0}
           icon={<CalendarClock aria-hidden />}
+          tone="warning"
+          href="/expiring"
+          index={2}
           hint={
             data?.expiring.reference
               ? `Ref. ${formatISODate(data.expiring.reference)}`
@@ -164,8 +179,11 @@ export default function DashboardPage() {
         />
         <KpiCard
           label="Prêmio mensal ativo"
-          value={formatCurrencyBRL(data?.activeMonthlyPremium ?? 0)}
+          value={data?.activeMonthlyPremium ?? 0}
+          format={formatCurrencyBRL}
           icon={<Wallet aria-hidden />}
+          tone="neutral"
+          index={3}
           hint={
             data?.premiumIsPartial
               ? "Somatório parcial das ativas"
@@ -177,8 +195,15 @@ export default function DashboardPage() {
 
       <section
         aria-label="Composição e vencimentos"
-        className="grid grid-cols-1 gap-6 lg:grid-cols-2"
+        className="grid grid-cols-1 gap-6 animate-fade-in [animation-delay:150ms] [animation-fill-mode:backwards] lg:grid-cols-3"
       >
+        <div className="lg:col-span-2">
+          <ExpiringBucketsCard
+            loading={summary.isLoading}
+            windowDays={data?.expiring.windowDays ?? 30}
+            buckets={data?.expiring.buckets ?? []}
+          />
+        </div>
         <StatusDistributionCard
           loading={summary.isLoading}
           total={totals?.policies ?? 0}
@@ -188,16 +213,11 @@ export default function DashboardPage() {
             { status: "Cancelada", count: totals?.cancelled ?? 0 },
           ]}
         />
-        <ExpiringBucketsCard
-          loading={summary.isLoading}
-          windowDays={data?.expiring.windowDays ?? 30}
-          buckets={data?.expiring.buckets ?? []}
-        />
       </section>
 
       <section
         aria-label="Listas rápidas"
-        className="grid grid-cols-1 gap-6 lg:grid-cols-2"
+        className="grid grid-cols-1 gap-6 animate-fade-in [animation-delay:250ms] [animation-fill-mode:backwards] lg:grid-cols-2"
       >
         <ListCard
           title="Apólices recentes"
@@ -286,6 +306,7 @@ export default function DashboardPage() {
           )}
         </ListCard>
       </section>
+      </div>
     </>
   );
 }

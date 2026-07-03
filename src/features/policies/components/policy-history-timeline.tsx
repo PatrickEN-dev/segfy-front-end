@@ -22,9 +22,7 @@ export function PolicyHistoryTimeline({ policyId }: { policyId: string }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-sm font-semibold tracking-tight">
-          Histórico de status
-        </CardTitle>
+        <CardTitle className="text-sm font-semibold tracking-tight">Histórico de status</CardTitle>
         <p className="text-xs text-muted-foreground">
           Mudanças registradas pela API, da mais recente para a mais antiga.
         </p>
@@ -41,8 +39,7 @@ export function PolicyHistoryTimeline({ policyId }: { policyId: string }) {
           <ErrorState error={error} onRetry={() => refetch()} />
         ) : entries.length === 0 ? (
           <p className="text-sm text-muted-foreground">
-            Nenhuma mudança de status até agora. A apólice permanece como foi
-            emitida.
+            Nenhuma mudança de status até agora. A apólice permanece como foi emitida.
           </p>
         ) : (
           <ol className="relative space-y-6 border-l border-[hsl(var(--hairline))] pl-5">
@@ -61,9 +58,7 @@ export function PolicyHistoryTimeline({ policyId }: { policyId: string }) {
                   {entry.toStatus}
                 </p>
                 {entry.reason && (
-                  <p className="mt-0.5 text-sm text-muted-foreground">
-                    {entry.reason}
-                  </p>
+                  <p className="mt-0.5 text-sm text-muted-foreground">{entry.reason}</p>
                 )}
                 <p className="mt-1 text-xs text-muted-foreground">
                   {formatISODateTime(entry.changedAt)}

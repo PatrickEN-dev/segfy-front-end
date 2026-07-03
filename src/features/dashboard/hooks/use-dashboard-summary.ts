@@ -4,9 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ApiError, type ApiErrorPayload } from "@/lib/http/api-error";
 import type { DashboardSummary } from "@/features/dashboard/types";
 
-async function fetchDashboardSummary(
-  signal?: AbortSignal,
-): Promise<DashboardSummary> {
+async function fetchDashboardSummary(signal?: AbortSignal): Promise<DashboardSummary> {
   const res = await fetch("/api/bff/dashboard", {
     signal,
     headers: { Accept: "application/json" },
@@ -18,8 +16,7 @@ async function fetchDashboardSummary(
     throw new ApiError({
       status: res.status,
       code: body?.error?.code ?? "UNKNOWN",
-      message:
-        body?.error?.message ?? "Não foi possível carregar o resumo do painel.",
+      message: body?.error?.message ?? "Não foi possível carregar o resumo do painel.",
       requestId: body?.error?.requestId,
     });
   }

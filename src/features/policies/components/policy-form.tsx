@@ -1,9 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
-import { Loader2 } from "lucide-react";
+import { AlertCircle, Loader2 } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -24,7 +24,13 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { ApiError } from "@/lib/http/api-error";
-import { parseCurrencyBRL } from "@/lib/format/currency";
+import { apiErrorMessage, translateFieldErrors } from "@/lib/http/error-messages";
+import { cn } from "@/lib/utils";
+import {
+  maskCurrencyBRL,
+  numberToCurrencyInput,
+  parseCurrencyBRL,
+} from "@/lib/format/currency";
 import {
   createPolicySchema,
   updatePolicySchema,
@@ -49,6 +55,12 @@ type Mode = "create" | "edit";
 interface PolicyFormProps {
   mode: Mode;
   initial?: Policy;
+  /** Sem card ao redor dos campos (para uso dentro de modal). */
+  embedded?: boolean;
+  /** Sobrescreve a navegação padrão pós-sucesso (push para o detalhe). */
+  onSuccess?: (policy: Policy) => void;
+  /** Sobrescreve o cancelar padrão (router.back). */
+  onCancel?: () => void;
 }
 
 interface FormShape {
@@ -65,9 +77,7 @@ function buildDefaults(policy?: Policy): FormShape {
   return {
     document: policy?.document ?? "",
     licensePlate: policy?.licensePlate ?? "",
-    premiumAmount: policy
-      ? policy.premiumAmount.toFixed(2).replace(".", ",")
-      : "",
+    premiumAmount: policy ? numberToCurrencyInput(policy.premiumAmount) : "",
     coverageStart: policy?.coverageStart ?? "",
     coverageEnd: policy?.coverageEnd ?? "",
     status: policy?.status ?? "Ativa",
@@ -75,7 +85,13 @@ function buildDefaults(policy?: Policy): FormShape {
   };
 }
 
-export function PolicyForm({ mode, initial }: PolicyFormProps) {
+export function PolicyForm({
+  mode,
+  initial,
+  embedded = false,
+  onSuccess,
+  onCancel,
+}: PolicyFormProps) {
   const router = useRouter();
   const createMutation = useCreatePolicy();
   const updateMutation = useUpdatePolicy();
@@ -85,14 +101,23 @@ export function PolicyForm({ mode, initial }: PolicyFormProps) {
     defaultValues: buildDefaults(initial),
     mode: "onBlur",
   });
+  const [rootError, setRootError] = useState<string | null>(null);
 
   useEffect(() => {
     if (initial) form.reset(buildDefaults(initial));
   }, [initial, form]);
 
-  const applyServerFieldErrors = (error: unknown) => {
-    if (!(error instanceof ApiError)) return;
-    const fields = error.fieldErrors();
+  /**
+   * Distribui o erro da API: mensagens de campo vão para os inputs
+   * (traduzidas) e qualquer erro sem campo associado vira um alerta geral,
+   * garantindo que sempre haja um retorno visível ao usuário.
+   */
+  const applyServerError = (error: unknown) => {
+    if (!(error instanceof ApiError)) {
+      setRootError(apiErrorMessage(error, "Não foi possível salvar a apólice."));
+      return;
+    }
+
     const known = new Set<keyof FormShape>([
       "document",
       "licensePlate",
@@ -107,19 +132,29 @@ export function PolicyForm({ mode, initial }: PolicyFormProps) {
         .replace(/[_\s]+([a-zA-Z0-9])/g, (_, ch) => ch.toUpperCase())
         .replace(/^([A-Z])/, (m) => m.toLowerCase());
 
+    const fields = translateFieldErrors(error);
+    let matchedField = false;
     for (const [name, messages] of Object.entries(fields)) {
       const first = messages[0];
       if (!first) continue;
       const candidate = toCamel(name);
       if (!known.has(candidate as keyof FormShape)) continue;
+      matchedField = true;
       form.setError(candidate as keyof FormShape, {
         type: "server",
         message: first,
       });
     }
+
+    // Sem campo mapeado (ex.: placa já ativa, transição inválida): mostra o
+    // erro traduzido no alerta do formulário para não passar despercebido.
+    if (!matchedField) {
+      setRootError(apiErrorMessage(error));
+    }
   };
 
   const onSubmit: SubmitHandler<FormShape> = async (raw) => {
+    setRootError(null);
     const premium = parseCurrencyBRL(raw.premiumAmount);
     const parsed = schema.safeParse({
       document: raw.document,
@@ -150,16 +185,18 @@ export function PolicyForm({ mode, initial }: PolicyFormProps) {
         const policy = await createMutation.mutateAsync(
           parsed.data as CreatePolicyInput,
         );
-        router.push(`/policies/${policy.id}`);
+        if (onSuccess) onSuccess(policy);
+        else router.push(`/policies/${policy.id}`);
       } else if (initial) {
         const policy = await updateMutation.mutateAsync({
           id: initial.id,
           input: parsed.data as UpdatePolicyInput,
         });
-        router.push(`/policies/${policy.id}`);
+        if (onSuccess) onSuccess(policy);
+        else router.push(`/policies/${policy.id}`);
       }
     } catch (error) {
-      applyServerFieldErrors(error);
+      applyServerError(error);
     }
   };
 
@@ -169,8 +206,13 @@ export function PolicyForm({ mode, initial }: PolicyFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <Card>
-          <CardContent className="grid grid-cols-1 gap-6 p-6 md:grid-cols-2">
+        <Card className={cn(embedded && "border-0 bg-transparent shadow-none")}>
+          <CardContent
+            className={cn(
+              "grid grid-cols-1 gap-6 p-6 md:grid-cols-2",
+              embedded && "p-0",
+            )}
+          >
             <FormField
               control={form.control}
               name="document"
@@ -228,10 +270,13 @@ export function PolicyForm({ mode, initial }: PolicyFormProps) {
                       autoComplete="off"
                       placeholder="199,90"
                       {...field}
+                      onChange={(event) =>
+                        field.onChange(maskCurrencyBRL(event.target.value))
+                      }
                     />
                   </FormControl>
                   <FormDescription>
-                    Valor mensal, até 2 casas decimais. Aceita ponto ou vírgula.
+                    Valor mensal em reais. A formatação é aplicada automaticamente.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -334,11 +379,21 @@ export function PolicyForm({ mode, initial }: PolicyFormProps) {
           </CardContent>
         </Card>
 
+        {rootError && (
+          <div
+            role="alert"
+            className="flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2.5 text-sm text-destructive"
+          >
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+            <span>{rootError}</span>
+          </div>
+        )}
+
         <div className="flex items-center justify-end gap-2">
           <Button
             type="button"
             variant="outline"
-            onClick={() => router.back()}
+            onClick={() => (onCancel ? onCancel() : router.back())}
             disabled={submitting}
           >
             Cancelar

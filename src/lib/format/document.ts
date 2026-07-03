@@ -8,10 +8,7 @@ export function formatDocument(raw: string): string {
     return digits.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
   }
   if (digits.length === 14) {
-    return digits.replace(
-      /(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,
-      "$1.$2.$3/$4-$5",
-    );
+    return digits.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5");
   }
   return raw;
 }
@@ -50,9 +47,7 @@ function validateCnpj(cnpj: string): boolean {
   const weights1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
   const weights2 = [6, ...weights1];
   const calc = (base: string, weights: number[]) => {
-    const sum = base
-      .split("")
-      .reduce((acc, ch, i) => acc + Number(ch) * (weights[i] ?? 0), 0);
+    const sum = base.split("").reduce((acc, ch, i) => acc + Number(ch) * (weights[i] ?? 0), 0);
     const mod = sum % 11;
     return mod < 2 ? 0 : 11 - mod;
   };

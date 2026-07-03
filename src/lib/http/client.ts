@@ -19,9 +19,7 @@ interface RequestOptions {
 
 const DEFAULT_TIMEOUT_MS = 60_000;
 
-function pruneQuery(
-  query?: RequestOptions["query"],
-): Record<string, string> | undefined {
+function pruneQuery(query?: RequestOptions["query"]): Record<string, string> | undefined {
   if (!query) return undefined;
   const out: Record<string, string> = {};
   for (const [key, value] of Object.entries(query)) {
@@ -100,12 +98,12 @@ export async function apiRequest<TResponse>(
 }
 
 export const api = {
-  get: <T,>(path: string, query?: RequestOptions["query"], signal?: AbortSignal) =>
+  get: <T>(path: string, query?: RequestOptions["query"], signal?: AbortSignal) =>
     apiRequest<T>(path, { method: "GET", query, signal }),
-  post: <T,>(path: string, body?: unknown, signal?: AbortSignal) =>
+  post: <T>(path: string, body?: unknown, signal?: AbortSignal) =>
     apiRequest<T>(path, { method: "POST", body, signal }),
-  put: <T,>(path: string, body?: unknown, signal?: AbortSignal) =>
+  put: <T>(path: string, body?: unknown, signal?: AbortSignal) =>
     apiRequest<T>(path, { method: "PUT", body, signal }),
-  delete: <T = void,>(path: string, signal?: AbortSignal) =>
+  delete: <T = void>(path: string, signal?: AbortSignal) =>
     apiRequest<T>(path, { method: "DELETE", signal }),
 };

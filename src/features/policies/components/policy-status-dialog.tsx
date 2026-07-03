@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Loader2 } from "lucide-react";
+import { AlertCircle, Loader2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -14,18 +14,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useUpdatePolicy } from "@/features/policies/hooks/use-update-policy";
+import { apiErrorMessage } from "@/lib/http/error-messages";
 import type { Policy, PolicyStatus } from "@/features/policies/types/policy-types";
 
 export type TerminalStatus = Extract<PolicyStatus, "Cancelada" | "Expirada">;
 
-const COPY: Record<
-  TerminalStatus,
-  { title: string; description: string; confirm: string }
-> = {
+const COPY: Record<TerminalStatus, { title: string; description: string; confirm: string }> = {
   Cancelada: {
     title: "Cancelar apólice",
-    description:
-      "A apólice ficará imutável após o cancelamento. Essa ação não pode ser desfeita.",
+    description: "A apólice ficará imutável após o cancelamento. Essa ação não pode ser desfeita.",
     confirm: "Cancelar apólice",
   },
   Expirada: {
@@ -42,17 +39,17 @@ interface PolicyStatusDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export function PolicyStatusDialog({
-  policy,
-  action,
-  onOpenChange,
-}: PolicyStatusDialogProps) {
+export function PolicyStatusDialog({ policy, action, onOpenChange }: PolicyStatusDialogProps) {
   const mutation = useUpdatePolicy();
   const [reason, setReason] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const open = Boolean(policy && action);
 
   useEffect(() => {
-    if (open) setReason("");
+    if (open) {
+      setReason("");
+      setError(null);
+    }
   }, [open]);
 
   if (!policy || !action) return null;
@@ -60,6 +57,7 @@ export function PolicyStatusDialog({
   const copy = COPY[action];
 
   const submit = async () => {
+    setError(null);
     try {
       await mutation.mutateAsync({
         id: policy.id,
@@ -74,8 +72,8 @@ export function PolicyStatusDialog({
         },
       });
       onOpenChange(false);
-    } catch {
-      // O toast de erro já é disparado pelo hook de update.
+    } catch (err) {
+      setError(apiErrorMessage(err, "Não foi possível alterar o status."));
     }
   };
 
@@ -104,6 +102,16 @@ export function PolicyStatusDialog({
           </p>
         </div>
 
+        {error && (
+          <div
+            role="alert"
+            className="flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2.5 text-sm text-destructive"
+          >
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+            <span>{error}</span>
+          </div>
+        )}
+
         <DialogFooter>
           <Button
             type="button"
@@ -119,9 +127,7 @@ export function PolicyStatusDialog({
             onClick={submit}
             disabled={mutation.isPending}
           >
-            {mutation.isPending && (
-              <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-            )}
+            {mutation.isPending && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
             {copy.confirm}
           </Button>
         </DialogFooter>

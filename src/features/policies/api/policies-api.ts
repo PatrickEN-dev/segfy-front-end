@@ -37,7 +37,7 @@ function classifySearch(raw: string | undefined): SearchTarget {
   const digits = onlyDigits(trimmed);
   const hasLetters = /[a-z]/i.test(trimmed);
 
-  // Placa: contém letra E dígito. Normaliza (upper, sem hífen).
+  // Placa: contém letra E dígito.
   if (hasLetters && digits.length > 0) {
     return { kind: "licensePlate", value: normalizePlate(trimmed) };
   }
@@ -55,10 +55,7 @@ function classifySearch(raw: string | undefined): SearchTarget {
   return null;
 }
 
-type ServerListParams = Record<
-  string,
-  string | number | boolean | undefined | null
->;
+type ServerListParams = Record<string, string | number | boolean | undefined | null>;
 
 function toServerParams(params: ListPoliciesParams): ServerListParams {
   const out: ServerListParams = {
@@ -86,11 +83,7 @@ export const policiesApi = {
     return api.get<ExpiringResponse>(`${BASE}/expiring`, undefined, signal);
   },
   history(id: string, signal?: AbortSignal) {
-    return api.get<StatusHistoryResponse>(
-      `${BASE}/${id}/history`,
-      undefined,
-      signal,
-    );
+    return api.get<StatusHistoryResponse>(`${BASE}/${id}/history`, undefined, signal);
   },
   create(input: CreatePolicyInput) {
     return api.post<Policy>(BASE, input);

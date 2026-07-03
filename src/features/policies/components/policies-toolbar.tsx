@@ -10,10 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import {
-  POLICY_STATUS,
-  type PolicyStatus,
-} from "@/features/policies/types/policy-types";
+import { POLICY_STATUS, type PolicyStatus } from "@/features/policies/types/policy-types";
 
 export type StatusFilter = PolicyStatus | "all";
 
@@ -69,14 +66,8 @@ export function PoliciesToolbar({
           )}
         </div>
 
-        <Select
-          value={status}
-          onValueChange={(value) => onStatusChange(value as StatusFilter)}
-        >
-          <SelectTrigger
-            className="w-full md:w-[180px]"
-            aria-label="Filtrar por status"
-          >
+        <Select value={status} onValueChange={(value) => onStatusChange(value as StatusFilter)}>
+          <SelectTrigger className="w-full md:w-[180px]" aria-label="Filtrar por status">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -89,14 +80,8 @@ export function PoliciesToolbar({
           </SelectContent>
         </Select>
 
-        <Select
-          value={sort}
-          onValueChange={(value) => onSortChange(value as SortOption)}
-        >
-          <SelectTrigger
-            className="w-full md:w-[210px]"
-            aria-label="Ordenar apólices"
-          >
+        <Select value={sort} onValueChange={(value) => onSortChange(value as SortOption)}>
+          <SelectTrigger className="w-full md:w-[210px]" aria-label="Ordenar apólices">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

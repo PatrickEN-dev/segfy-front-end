@@ -10,10 +10,7 @@ const dotClass: Record<PolicyStatus, string> = {
 export function PolicyStatusBadge({ status }: { status: PolicyStatus }) {
   return (
     <span className="inline-flex items-center gap-2 text-xs font-medium text-foreground">
-      <span
-        aria-hidden
-        className={cn("h-1.5 w-1.5 rounded-full", dotClass[status])}
-      />
+      <span aria-hidden className={cn("h-1.5 w-1.5 rounded-full", dotClass[status])} />
       {status}
     </span>
   );

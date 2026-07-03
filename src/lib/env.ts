@@ -19,9 +19,7 @@ const parsed = envSchema.safeParse({
 
 if (!parsed.success) {
   const flat = parsed.error.flatten().fieldErrors;
-  throw new Error(
-    `Invalid environment variables:\n${JSON.stringify(flat, null, 2)}`,
-  );
+  throw new Error(`Invalid environment variables:\n${JSON.stringify(flat, null, 2)}`);
 }
 
 export const env = parsed.data;

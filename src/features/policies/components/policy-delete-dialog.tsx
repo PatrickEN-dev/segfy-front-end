@@ -42,8 +42,7 @@ export function PolicyDeleteDialog({
       description={
         policy ? (
           <span>
-            Esta ação é irreversível. Confirmar exclusão de{" "}
-            <strong>{policy.number}</strong>?
+            Esta ação é irreversível. Confirmar exclusão de <strong>{policy.number}</strong>?
           </span>
         ) : null
       }

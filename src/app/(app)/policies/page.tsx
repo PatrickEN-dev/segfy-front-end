@@ -78,7 +78,7 @@ function PoliciesPageFallback() {
         title="Apólices"
         description="Cadastro de apólices de seguro automóvel."
       />
-      <div className="rounded-md border border-border bg-background">
+      <div className="overflow-hidden rounded-xl border border-border bg-card">
         <div className="space-y-2 p-6">
           {Array.from({ length: 6 }).map((_, i) => (
             <Skeleton key={i} className="h-10 w-full" />
@@ -233,7 +233,7 @@ function PoliciesPageInner() {
         }
       />
 
-      <div className="rounded-md border border-border bg-background">
+      <div className="overflow-hidden rounded-xl border border-border bg-card">
         <PoliciesToolbar
           search={searchInput}
           status={status}

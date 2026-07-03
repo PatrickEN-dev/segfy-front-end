@@ -18,9 +18,7 @@ export function PolicySummaryCard({ policy }: { policy: Policy }) {
     <Card>
       <CardHeader className="flex flex-row items-start justify-between gap-3">
         <div className="space-y-1">
-          <CardTitle className="font-mono text-lg tracking-tight">
-            {policy.number}
-          </CardTitle>
+          <CardTitle className="font-mono text-lg tracking-tight">{policy.number}</CardTitle>
           <p className="text-xs text-muted-foreground">
             Emitida em {formatISODateTime(policy.createdAt)}
           </p>
@@ -35,18 +33,12 @@ export function PolicySummaryCard({ policy }: { policy: Policy }) {
         <DataRow label="Placa do veículo" mono>
           {formatPolicyPlate(policy.licensePlate)}
         </DataRow>
-        <DataRow label="Início da vigência">
-          {formatISODate(policy.coverageStart)}
-        </DataRow>
-        <DataRow label="Fim da vigência">
-          {formatISODate(policy.coverageEnd)}
-        </DataRow>
+        <DataRow label="Início da vigência">{formatISODate(policy.coverageStart)}</DataRow>
+        <DataRow label="Fim da vigência">{formatISODate(policy.coverageEnd)}</DataRow>
         <DataRow label="Valor do prêmio" mono>
           {formatCurrencyBRL(policy.premiumAmount)}
         </DataRow>
-        <DataRow label="Última atualização">
-          {formatISODateTime(policy.updatedAt)}
-        </DataRow>
+        <DataRow label="Última atualização">{formatISODateTime(policy.updatedAt)}</DataRow>
       </CardContent>
     </Card>
   );

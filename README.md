@@ -2,6 +2,8 @@
 
 Painel corporativo para gestão de apólices de seguro automóvel. Aplicação Next.js 14 (App Router) consumindo uma API REST tipada, com cadastro completo, monitoramento de vencimentos e controle de status.
 
+> **Avaliando o projeto?** Comece por [docs/APRESENTACAO.md](docs/APRESENTACAO.md): um tour de 5 minutos pelas decisões técnicas, com mapa de onde olhar no código.
+
 ## Stack
 
 | Camada | Tecnologia |
@@ -49,7 +51,8 @@ src/
 │   ├── layout/   Shell da aplicação (sidebar, topbar, breadcrumbs).
 │   └── shared/   Blocos reutilizáveis (empty-state, kpi-card, pagination).
 ├── features/
-│   └── policies/ Feature isolada. Agrupa api, schemas, hooks e componentes.
+│   ├── policies/ Feature isolada. Agrupa api, schemas, hooks e componentes.
+│   └── dashboard/ Agregações e cards do painel.
 └── app/          Rotas Next.js. Páginas compõem features + shared + ui.
 ```
 
@@ -78,6 +81,12 @@ Trocar de tela reutiliza o mesmo hook, a mesma tabela e o mesmo formulário.
 | `/policies/[id]/edit` | Edição com controle de transições de status |
 | `/expiring` | Apólices ativas vencendo em até 30 dias |
 
+`/policies/new` e `/policies/[id]/edit` também abrem como modal por cima da lista (intercepting routes via slot `@modal`). Em acesso direto pela URL, renderizam como página cheia.
+
+## Estados de carregamento e erro
+
+Cada rota tem `loading.tsx` com um skeleton que espelha o layout real da página (KPIs no dashboard, toolbar + linhas na lista, campos no formulário), e `error.tsx` como error boundary que preserva sidebar e topbar, com botão de retry e `digest` do erro visível. Dentro das páginas, os fetches do TanStack Query têm seus próprios estados de loading, empty e erro com retry.
+
 ## Decisões de projeto
 
 **Rewrites no Next para esconder o backend.** O browser conhece apenas paths relativos como `/api/segfy/policies`. O `next.config.mjs` reescreve para `${SEGFY_API_URL}/api/v1/policies` no servidor. Isso elimina CORS e mantém a URL real do backend fora do bundle.
@@ -85,6 +94,12 @@ Trocar de tela reutiliza o mesmo hook, a mesma tabela e o mesmo formulário.
 **Validação no cliente e no servidor com o mesmo schema.** Zod é usado tanto para validar o formulário (`react-hook-form`) quanto para gerar os tipos de input das chamadas HTTP. Erros de validação retornados pela API no formato `details: Record<string, string[]>` são espalhados nos campos do formulário via `form.setError`.
 
 **Query-keys centralizadas.** Toda invalidação passa por `hooks/query-keys.ts`. Mutations invalidam o mínimo necessário.
+
+**Busca roteada por formato do termo.** A API não expõe busca global, apenas filtros por `number`, `licensePlate` e `document`. O front classifica o que o usuário digitou (número de apólice, placa ou CPF/CNPJ) e envia para o filtro correto. Ver `classifySearch` em [`src/features/policies/api/policies-api.ts`](src/features/policies/api/policies-api.ts).
+
+**Filtros na URL.** Busca, status, ordenação e paginação vivem na query string. Qualquer visão da lista é compartilhável por link e sobrevive a refresh.
+
+**Timeout dimensionado para cold start.** O backend no free tier do Render dorme após inatividade e o primeiro request pode levar ~30 s. O timeout do cliente HTTP acomoda esse caso em vez de estourar erro.
 
 **Transições de status controladas.** `Ativa` pode ir para `Cancelada` ou `Expirada`. `Cancelada` e `Expirada` são estados terminais e o próprio formulário desabilita o select nesses casos.
 

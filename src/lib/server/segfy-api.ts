@@ -16,9 +16,7 @@ export function segfyBaseUrl(): string {
   const raw = process.env.SEGFY_API_URL?.trim();
   if (raw) {
     if (!/^https?:\/\//i.test(raw)) {
-      throw new Error(
-        `SEGFY_API_URL deve começar com http:// ou https:// (recebido: "${raw}").`,
-      );
+      throw new Error(`SEGFY_API_URL deve começar com http:// ou https:// (recebido: "${raw}").`);
     }
     return raw.replace(/\/$/, "");
   }

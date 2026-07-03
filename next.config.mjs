@@ -25,6 +25,12 @@ function resolveApiTarget() {
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  async redirects() {
+    // Redirect da raiz no nível HTTP (307), antes de qualquer render React.
+    // Fazer isso via redirect() em app/page.tsx, junto do loading.tsx global,
+    // prende o primeiro carregamento no spinner (o destino não chega a montar).
+    return [{ source: "/", destination: "/dashboard", permanent: false }];
+  },
   async rewrites() {
     const target = resolveApiTarget();
     return [

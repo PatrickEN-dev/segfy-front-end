@@ -1,5 +1,6 @@
 import { Brand } from "@/components/layout/brand";
 import { NavItem } from "@/components/layout/nav-item";
+import { ThemeToggleMenuItem } from "@/components/theme/theme-toggle";
 import { primaryNav } from "@/config/nav";
 import { siteConfig } from "@/config/site";
 
@@ -19,13 +20,13 @@ export function Sidebar() {
         ))}
       </nav>
 
+      <div className="border-t border-sidebar-border px-3 py-2">
+        <ThemeToggleMenuItem />
+      </div>
+
       <div className="mx-6 mb-4 rounded-md border border-sidebar-border p-3">
-        <p className="text-xs font-medium text-sidebar-foreground">
-          {siteConfig.tenantLabel}
-        </p>
-        <p className="mt-0.5 text-[11px] text-sidebar-muted">
-          Ambiente de demonstração
-        </p>
+        <p className="text-xs font-medium text-sidebar-foreground">{siteConfig.tenantLabel}</p>
+        <p className="mt-0.5 text-[11px] text-sidebar-muted">Ambiente de demonstração</p>
       </div>
     </aside>
   );

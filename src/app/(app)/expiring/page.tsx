@@ -19,7 +19,7 @@ export default function ExpiringPage() {
     <>
       <PageHeader title="Vencimentos" description={description} />
 
-      <div className="rounded-md border border-border bg-background">
+      <div className="overflow-hidden rounded-xl border border-border bg-card">
         {isLoading && !data ? (
           <div className="space-y-2 p-6">
             {Array.from({ length: 5 }).map((_, i) => (

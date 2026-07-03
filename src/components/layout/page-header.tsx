@@ -28,15 +28,9 @@ export function PageHeader({
         <h1 className="text-2xl font-semibold leading-tight tracking-tight text-foreground">
           {title}
         </h1>
-        {description && (
-          <p className="max-w-2xl text-sm text-muted-foreground">
-            {description}
-          </p>
-        )}
+        {description && <p className="max-w-2xl text-sm text-muted-foreground">{description}</p>}
       </div>
-      {actions && (
-        <div className="flex items-center gap-2 md:pb-1">{actions}</div>
-      )}
+      {actions && <div className="flex items-center gap-2 md:pb-1">{actions}</div>}
     </div>
   );
 }

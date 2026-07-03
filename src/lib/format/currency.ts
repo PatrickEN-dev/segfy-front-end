@@ -11,6 +11,24 @@ export function formatCurrencyBRL(value: number | string): string {
   return brl.format(n);
 }
 
+const brlNumber = new Intl.NumberFormat("pt-BR", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+export function maskCurrencyBRL(input: string): string {
+  const digits = input.replace(/\D/g, "");
+  if (!digits) return "";
+  const value = Number(digits) / 100;
+  if (!Number.isFinite(value)) return "";
+  return brlNumber.format(value);
+}
+
+export function numberToCurrencyInput(value: number): string {
+  if (!Number.isFinite(value)) return "";
+  return maskCurrencyBRL(value.toFixed(2).replace(/\D/g, ""));
+}
+
 export function parseCurrencyBRL(input: string): number | null {
   if (!input) return null;
   const normalized = input

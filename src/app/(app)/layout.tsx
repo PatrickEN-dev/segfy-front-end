@@ -3,8 +3,10 @@ import { Topbar } from "@/components/layout/topbar";
 
 export default function AppLayout({
   children,
+  modal,
 }: {
   children: React.ReactNode;
+  modal: React.ReactNode;
 }) {
   return (
     <div className="flex min-h-screen bg-background">
@@ -17,6 +19,7 @@ export default function AppLayout({
           </div>
         </main>
       </div>
+      {modal}
     </div>
   );
 }

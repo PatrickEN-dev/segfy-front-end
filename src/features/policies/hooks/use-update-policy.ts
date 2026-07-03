@@ -4,7 +4,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { policiesApi } from "@/features/policies/api/policies-api";
 import { policyKeys } from "./query-keys";
-import { ApiError } from "@/lib/http/api-error";
 import type { UpdatePolicyInput } from "@/features/policies/schemas/policy-schemas";
 
 interface UpdateArgs {
@@ -25,18 +24,6 @@ export function useUpdatePolicy() {
         description: `Alterações em ${policy.number} salvas.`,
       });
     },
-    onError: (error) => {
-      if (
-        error instanceof ApiError &&
-        (error.code === "VALIDATION_ERROR" || error.code === "DOMAIN_VALIDATION")
-      ) {
-        return;
-      }
-      const message =
-        error instanceof ApiError
-          ? error.message
-          : "Não foi possível atualizar a apólice.";
-      toast.error("Erro ao atualizar apólice", { description: message });
-    },
+    // Erros são exibidos, traduzidos, por quem chama (formulário / diálogo de status).
   });
 }

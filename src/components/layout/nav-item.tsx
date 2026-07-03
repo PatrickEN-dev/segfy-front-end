@@ -12,9 +12,7 @@ interface NavItemProps {
 export function NavItem({ item }: NavItemProps) {
   const pathname = usePathname();
   const isActive =
-    item.matchMode === "prefix"
-      ? pathname.startsWith(item.href)
-      : pathname === item.href;
+    item.matchMode === "prefix" ? pathname.startsWith(item.href) : pathname === item.href;
 
   return (
     <Link

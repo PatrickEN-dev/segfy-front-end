@@ -13,6 +13,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Brand } from "@/components/layout/brand";
+import { ThemeToggleMenuItem } from "@/components/theme/theme-toggle";
 import { primaryNav } from "@/config/nav";
 import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils";
@@ -71,7 +72,10 @@ export function MobileNav() {
             );
           })}
         </nav>
-        <div className="mt-auto rounded-md border border-sidebar-border bg-sidebar-accent/60 p-3">
+        <div className="mt-auto border-t border-sidebar-border pt-2">
+          <ThemeToggleMenuItem />
+        </div>
+        <div className="rounded-md border border-sidebar-border bg-sidebar-accent/60 p-3">
           <p className="text-xs font-medium text-sidebar-foreground">
             {siteConfig.tenantLabel}
           </p>
