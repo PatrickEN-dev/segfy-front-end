@@ -18,6 +18,7 @@ export function useUpdatePolicy() {
     mutationFn: ({ id, input }: UpdateArgs) => policiesApi.update(id, input),
     onSuccess: (policy) => {
       qc.setQueryData(policyKeys.detail(policy.id), policy);
+      qc.invalidateQueries({ queryKey: policyKeys.history(policy.id) });
       qc.invalidateQueries({ queryKey: policyKeys.lists() });
       qc.invalidateQueries({ queryKey: policyKeys.expiring() });
       toast.success("Apólice atualizada", {

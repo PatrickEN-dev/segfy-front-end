@@ -58,6 +58,7 @@ interface FormShape {
   coverageStart: string;
   coverageEnd: string;
   status: PolicyStatus;
+  statusReason: string;
 }
 
 function buildDefaults(policy?: Policy): FormShape {
@@ -70,6 +71,7 @@ function buildDefaults(policy?: Policy): FormShape {
     coverageStart: policy?.coverageStart ?? "",
     coverageEnd: policy?.coverageEnd ?? "",
     status: policy?.status ?? "Ativa",
+    statusReason: "",
   };
 }
 
@@ -98,6 +100,7 @@ export function PolicyForm({ mode, initial }: PolicyFormProps) {
       "coverageStart",
       "coverageEnd",
       "status",
+      "statusReason",
     ]);
     const toCamel = (raw: string) =>
       raw
@@ -124,7 +127,9 @@ export function PolicyForm({ mode, initial }: PolicyFormProps) {
       premiumAmount: premium ?? Number.NaN,
       coverageStart: raw.coverageStart,
       coverageEnd: raw.coverageEnd,
-      ...(mode === "edit" ? { status: raw.status } : {}),
+      ...(mode === "edit"
+        ? { status: raw.status, statusReason: raw.statusReason }
+        : {}),
     });
 
     if (!parsed.success) {
@@ -272,6 +277,32 @@ export function PolicyForm({ mode, initial }: PolicyFormProps) {
                 }}
               />
             )}
+
+            {mode === "edit" &&
+              initial &&
+              form.watch("status") !== initial.status && (
+                <FormField
+                  control={form.control}
+                  name="statusReason"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Motivo da mudança de status</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Ex.: cancelamento a pedido do cliente"
+                          autoComplete="off"
+                          maxLength={500}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Opcional. Fica registrado no histórico da apólice.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
 
             <FormField
               control={form.control}

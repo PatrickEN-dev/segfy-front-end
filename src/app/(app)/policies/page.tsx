@@ -13,12 +13,16 @@ import { PoliciesTable } from "@/features/policies/components/policies-table";
 import { PolicyDeleteDialog } from "@/features/policies/components/policy-delete-dialog";
 import {
   PoliciesToolbar,
+  SORT_OPTIONS,
+  type SortOption,
   type StatusFilter,
 } from "@/features/policies/components/policies-toolbar";
 import { usePoliciesList } from "@/features/policies/hooks/use-policies-list";
 import {
   POLICY_STATUS,
   type Policy,
+  type PolicySortDir,
+  type PolicySortField,
   type PolicyStatus,
 } from "@/features/policies/types/policy-types";
 import { useDebouncedValue } from "@/lib/use-debounced-value";
@@ -43,6 +47,20 @@ function readStatus(value: string | null): StatusFilter {
     return value as PolicyStatus;
   }
   return "all";
+}
+
+function readSort(value: string | null): SortOption {
+  const match = SORT_OPTIONS.find((option) => option.value === value);
+  return match ? match.value : "recent";
+}
+
+function sortToParams(sort: SortOption): {
+  sortBy?: PolicySortField;
+  sortDir?: PolicySortDir;
+} {
+  if (sort === "recent") return {};
+  const [sortBy, sortDir] = sort.split(":") as [PolicySortField, PolicySortDir];
+  return { sortBy, sortDir };
 }
 
 export default function PoliciesPage() {
@@ -84,6 +102,7 @@ function PoliciesPageInner() {
   );
   const urlSearch = searchParams.get("q") ?? "";
   const status = readStatus(searchParams.get("status"));
+  const sort = readSort(searchParams.get("sort"));
 
   const [searchInput, setSearchInput] = useState(urlSearch);
   const debouncedSearch = useDebouncedValue(searchInput, 300);
@@ -93,6 +112,7 @@ function PoliciesPageInner() {
     pageSize,
     q: urlSearch || undefined,
     status: status === "all" ? undefined : status,
+    ...sortToParams(sort),
   });
   const [toDelete, setToDelete] = useState<Policy | null>(null);
 
@@ -131,6 +151,12 @@ function PoliciesPageInner() {
   const setStatus = useCallback(
     (value: StatusFilter) =>
       updateParams({ status: value === "all" ? null : value, page: "1" }),
+    [updateParams],
+  );
+
+  const setSort = useCallback(
+    (value: SortOption) =>
+      updateParams({ sort: value === "recent" ? null : value, page: "1" }),
     [updateParams],
   );
 
@@ -211,8 +237,10 @@ function PoliciesPageInner() {
         <PoliciesToolbar
           search={searchInput}
           status={status}
+          sort={sort}
           onSearchChange={setSearchInput}
           onStatusChange={setStatus}
+          onSortChange={setSort}
           onClear={clearFilters}
           hasFilters={hasFilters}
           resultCount={meta?.total}

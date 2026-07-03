@@ -61,6 +61,12 @@ export const updatePolicySchema = z
     coverageStart: isoDate,
     coverageEnd: isoDate,
     status: z.enum(POLICY_STATUS),
+    statusReason: z
+      .string()
+      .trim()
+      .max(500, "Motivo deve ter no máximo 500 caracteres.")
+      .optional()
+      .transform((v) => (v ? v : undefined)),
   })
   .superRefine(coverageRefinement);
 

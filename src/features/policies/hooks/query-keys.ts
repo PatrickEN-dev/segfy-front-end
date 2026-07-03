@@ -7,5 +7,6 @@ export const policyKeys = {
     [...policyKeys.lists(), params] as const,
   details: () => [...policyKeys.all, "detail"] as const,
   detail: (id: string) => [...policyKeys.details(), id] as const,
+  history: (id: string) => [...policyKeys.detail(id), "history"] as const,
   expiring: () => [...policyKeys.all, "expiring"] as const,
 };

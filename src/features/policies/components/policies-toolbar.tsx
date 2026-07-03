@@ -17,11 +17,22 @@ import {
 
 export type StatusFilter = PolicyStatus | "all";
 
+export const SORT_OPTIONS = [
+  { value: "recent", label: "Mais recentes" },
+  { value: "coverageEnd:asc", label: "Vencimento mais próximo" },
+  { value: "premium:desc", label: "Maior prêmio" },
+  { value: "premium:asc", label: "Menor prêmio" },
+] as const;
+
+export type SortOption = (typeof SORT_OPTIONS)[number]["value"];
+
 interface PoliciesToolbarProps {
   search: string;
   status: StatusFilter;
+  sort: SortOption;
   onSearchChange: (value: string) => void;
   onStatusChange: (value: StatusFilter) => void;
+  onSortChange: (value: SortOption) => void;
   onClear: () => void;
   hasFilters?: boolean;
   resultCount?: number;
@@ -31,8 +42,10 @@ interface PoliciesToolbarProps {
 export function PoliciesToolbar({
   search,
   status,
+  sort,
   onSearchChange,
   onStatusChange,
+  onSortChange,
   onClear,
   hasFilters = false,
   resultCount,
@@ -71,6 +84,25 @@ export function PoliciesToolbar({
             {POLICY_STATUS.map((s) => (
               <SelectItem key={s} value={s}>
                 {s}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select
+          value={sort}
+          onValueChange={(value) => onSortChange(value as SortOption)}
+        >
+          <SelectTrigger
+            className="w-full md:w-[210px]"
+            aria-label="Ordenar apólices"
+          >
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {SORT_OPTIONS.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
               </SelectItem>
             ))}
           </SelectContent>

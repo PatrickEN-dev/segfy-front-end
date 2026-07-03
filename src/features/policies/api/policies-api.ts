@@ -6,6 +6,7 @@ import type {
   ListPoliciesParams,
   Paginated,
   Policy,
+  StatusHistoryResponse,
 } from "@/features/policies/types/policy-types";
 import type {
   CreatePolicyInput,
@@ -64,6 +65,8 @@ function toServerParams(params: ListPoliciesParams): ServerListParams {
     page: params.page,
     pageSize: params.pageSize,
     status: params.status,
+    sortBy: params.sortBy,
+    sortDir: params.sortDir,
   };
   const target = classifySearch(params.q);
   if (target) {
@@ -81,6 +84,13 @@ export const policiesApi = {
   },
   expiring(signal?: AbortSignal) {
     return api.get<ExpiringResponse>(`${BASE}/expiring`, undefined, signal);
+  },
+  history(id: string, signal?: AbortSignal) {
+    return api.get<StatusHistoryResponse>(
+      `${BASE}/${id}/history`,
+      undefined,
+      signal,
+    );
   },
   create(input: CreatePolicyInput) {
     return api.post<Policy>(BASE, input);

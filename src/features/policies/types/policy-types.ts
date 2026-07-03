@@ -32,9 +32,27 @@ export interface ExpiringResponse {
   };
 }
 
+export const POLICY_SORT_FIELDS = ["createdAt", "coverageEnd", "premium"] as const;
+export type PolicySortField = (typeof POLICY_SORT_FIELDS)[number];
+export type PolicySortDir = "asc" | "desc";
+
 export interface ListPoliciesParams {
   page?: number;
   pageSize?: number;
   q?: string;
   status?: PolicyStatus;
+  sortBy?: PolicySortField;
+  sortDir?: PolicySortDir;
+}
+
+export interface StatusHistoryEntry {
+  id: string;
+  fromStatus: PolicyStatus;
+  toStatus: PolicyStatus;
+  reason: string | null;
+  changedAt: string;
+}
+
+export interface StatusHistoryResponse {
+  data: StatusHistoryEntry[];
 }
