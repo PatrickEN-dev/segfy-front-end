@@ -4,6 +4,16 @@ Painel corporativo para gestão de apólices de seguro automóvel. Aplicação N
 
 > **Avaliando o projeto?** Comece por [docs/APRESENTACAO.md](docs/APRESENTACAO.md): um tour de 5 minutos pelas decisões técnicas, com mapa de onde olhar no código.
 
+## Funcionalidades
+
+- **Dashboard** com KPIs (total, ativas, vencendo, prêmio mensal ativo), distribuição por status e buckets de vencimento. Os dados vêm de um BFF que agrega várias chamadas do backend numa única resposta.
+- **Listagem** paginada com busca inteligente (roteia número, placa ou CPF/CNPJ para o filtro certo), filtro por status e ordenação, tudo refletido na URL.
+- **Cadastro e edição** com máscara de moeda em tempo real e validação no cliente e no servidor pelo mesmo schema Zod.
+- **Ciclo de vida** da apólice: cancelar, expirar e histórico de status, com transições controladas.
+- **Vencimentos** em até 30 dias numa visão dedicada.
+- **Erros da API traduzidos** para pt-BR e sempre exibidos (inline no formulário ou via toast).
+- **Tema claro e escuro** com persistência, e formulários que abrem como modal por cima da lista.
+
 ## Stack
 
 | Camada | Tecnologia |
@@ -12,8 +22,10 @@ Painel corporativo para gestão de apólices de seguro automóvel. Aplicação N
 | Linguagem | TypeScript 5 (`strict`, `noUncheckedIndexedAccess`) |
 | UI | Tailwind CSS 3, shadcn/ui, Radix primitives |
 | Estado servidor | TanStack Query 5 |
+| Agregação | Route Handlers do Next como BFF (dashboard) |
 | Formulários | react-hook-form + Zod |
 | HTTP | Axios com cliente tipado e mapeamento de erros |
+| Gráficos | Recharts 3 |
 | Tema | Modo claro e escuro com persistência local |
 | Deploy | Vercel |
 
@@ -53,7 +65,8 @@ src/
 ├── features/
 │   ├── policies/ Feature isolada. Agrupa api, schemas, hooks e componentes.
 │   └── dashboard/ Agregações e cards do painel.
-└── app/          Rotas Next.js. Páginas compõem features + shared + ui.
+└── app/          Rotas Next.js + Route Handlers. Páginas compõem features + shared + ui.
+    └── api/bff/  Backend-for-frontend: agrega o backend no servidor (dashboard).
 ```
 
 ### Como cada feature se organiza
@@ -89,7 +102,11 @@ Cada rota tem `loading.tsx` com um skeleton que espelha o layout real da página
 
 ## Decisões de projeto
 
-**Rewrites no Next para esconder o backend.** O browser conhece apenas paths relativos como `/api/segfy/policies`. O `next.config.mjs` reescreve para `${SEGFY_API_URL}/api/v1/policies` no servidor. Isso elimina CORS e mantém a URL real do backend fora do bundle.
+**Duas vias de dados: rewrite e BFF.** Recursos (listas, detalhe, mutations) vão do browser para paths relativos como `/api/segfy/policies`, que o `next.config.mjs` reescreve para `${SEGFY_API_URL}/api/v1/policies` no servidor. Isso elimina CORS e mantém a URL real do backend fora do bundle. Já o dashboard consome um BFF (`/api/bff/dashboard`, em [`src/app/api/bff/dashboard/route.ts`](src/app/api/bff/dashboard/route.ts)) que dispara as chamadas necessárias em paralelo no servidor, calcula buckets e totais e devolve um payload único, evitando cinco requests em cascata no cliente.
+
+**Erros da API traduzidos e sempre visíveis.** O backend responde mensagens em inglês. A camada em [`src/lib/http/error-messages.ts`](src/lib/http/error-messages.ts) mapeia códigos e mensagens (inclusive as parametrizadas, como placa e status) para pt-BR. No formulário, erros de campo aparecem inline e qualquer erro de domínio sem campo associado vira um alerta fixo, garantindo que nada seja engolido silenciosamente.
+
+**Redirect da raiz no nível HTTP.** `/` redireciona para `/dashboard` via `redirects()` no `next.config.mjs`, antes de qualquer render React. Fazer isso com `redirect()` numa página do App Router, junto de um `loading.tsx` global, prendia o primeiro carregamento no spinner.
 
 **Validação no cliente e no servidor com o mesmo schema.** Zod é usado tanto para validar o formulário (`react-hook-form`) quanto para gerar os tipos de input das chamadas HTTP. Erros de validação retornados pela API no formato `details: Record<string, string[]>` são espalhados nos campos do formulário via `form.setError`.
 
@@ -149,12 +166,24 @@ Clique em Deploy. Cada push na branch principal gera um deploy. PRs geram previe
 
 ### Fluxo de requisição em produção
 
+Recursos (listas, detalhe, mutations) via rewrite:
+
 ```
 browser -> seu-app.vercel.app/api/segfy/policies
                     |
-                    | rewrite (next.config.mjs)
+                    | rewrite no servidor (next.config.mjs)
                     v
           SEGFY_API_URL/api/v1/policies
 ```
 
-O browser nunca conhece a URL real do backend, então não há CORS a configurar do lado da API.
+Dashboard via BFF (Route Handler agrega no servidor):
+
+```
+browser -> seu-app.vercel.app/api/bff/dashboard
+                    |
+                    | route handler chama o backend em paralelo e agrega
+                    v
+          SEGFY_API_URL/api/v1/policies (+ /policies/expiring, filtros)
+```
+
+Nos dois casos o browser nunca conhece a URL real do backend, então não há CORS a configurar do lado da API.
