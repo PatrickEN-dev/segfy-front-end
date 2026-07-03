@@ -12,7 +12,6 @@ const config: Config = {
     extend: {
       fontFamily: {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
-        display: ["var(--font-display)", "var(--font-sans)", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -69,24 +68,11 @@ const config: Config = {
           border: "hsl(var(--sidebar-border))",
           active: "hsl(var(--sidebar-active))",
         },
-        chart: {
-          "1": "hsl(var(--chart-1))",
-          "2": "hsl(var(--chart-2))",
-          "3": "hsl(var(--chart-3))",
-          "4": "hsl(var(--chart-4))",
-          "5": "hsl(var(--chart-5))",
-        },
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
-      },
-      boxShadow: {
-        soft: "0 1px 2px 0 hsl(222 47% 11% / 0.04), 0 1px 3px 0 hsl(222 47% 11% / 0.06)",
-        elevated:
-          "0 2px 4px -2px hsl(222 47% 11% / 0.06), 0 8px 16px -4px hsl(222 47% 11% / 0.08)",
-        brand: "0 8px 24px -6px hsl(217 91% 30% / 0.35)",
       },
       keyframes: {
         "accordion-down": {

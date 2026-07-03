@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, CalendarClock, FileText } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { KpiCard } from "@/components/shared/kpi-card";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -24,9 +23,8 @@ export default function DashboardPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Painel operacional"
         title="Visão geral"
-        description="Panorama das apólices ativas na corretora."
+        description="Panorama das apólices ativas."
       />
 
       <section
@@ -36,15 +34,11 @@ export default function DashboardPage() {
         <KpiCard
           label="Apólices na base"
           value={totalPolicies}
-          icon={<FileText />}
-          accent="primary"
           loading={list.isLoading}
         />
         <KpiCard
           label="Vencendo em 30 dias"
           value={expiringCount}
-          icon={<CalendarClock />}
-          accent="warning"
           hint={
             expiring.data?.meta.reference
               ? `Ref. ${formatISODate(expiring.data.meta.reference)}`
@@ -55,22 +49,21 @@ export default function DashboardPage() {
       </section>
 
       <section className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div className="rounded-xl border border-border/70 bg-card p-6 shadow-soft">
+        <div className="rounded-md border border-border bg-card p-6">
           <div className="mb-4 flex items-baseline justify-between">
             <div>
-              <h2 className="font-display text-base font-semibold tracking-tight">
+              <h2 className="text-sm font-semibold tracking-tight">
                 Apólices recentes
               </h2>
               <p className="text-xs text-muted-foreground">
-                As últimas 5 emissões
+                Últimas 5 emissões
               </p>
             </div>
             <Link
               href="/policies"
-              className="inline-flex items-center gap-1 text-xs font-medium text-primary transition-colors hover:text-primary/80"
+              className="text-xs font-medium text-primary hover:underline"
             >
               Ver todas
-              <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
           <div className="divide-y divide-hairline">
@@ -87,7 +80,7 @@ export default function DashboardPage() {
                 title="Nenhuma apólice cadastrada"
                 description="Comece cadastrando a primeira apólice."
                 action={
-                  <Button asChild size="sm" variant="brand">
+                  <Button asChild size="sm">
                     <Link href="/policies/new">Cadastrar apólice</Link>
                   </Button>
                 }
@@ -116,22 +109,21 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-border/70 bg-card p-6 shadow-soft">
+        <div className="rounded-md border border-border bg-card p-6">
           <div className="mb-4 flex items-baseline justify-between">
             <div>
-              <h2 className="font-display text-base font-semibold tracking-tight">
+              <h2 className="text-sm font-semibold tracking-tight">
                 Próximos vencimentos
               </h2>
               <p className="text-xs text-muted-foreground">
-                Ativas que vencem em até 30 dias
+                Ativas com vencimento em até 30 dias
               </p>
             </div>
             <Link
               href="/expiring"
-              className="inline-flex items-center gap-1 text-xs font-medium text-primary transition-colors hover:text-primary/80"
+              className="text-xs font-medium text-primary hover:underline"
             >
               Detalhar
-              <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
           <div className="divide-y divide-hairline">

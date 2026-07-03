@@ -20,7 +20,7 @@ type SearchTarget =
   | { kind: "document"; value: string }
   | null;
 
-// A API não tem um filtro "q" global — expõe `document`, `licensePlate` e
+// A API não tem filtro "q" global. Ela expõe `document`, `licensePlate` e
 // `number` (todos CONTAINS, combinados via AND). Roteamos a busca do usuário
 // para o campo certo com base no formato do termo digitado.
 function classifySearch(raw: string | undefined): SearchTarget {

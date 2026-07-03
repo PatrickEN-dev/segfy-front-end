@@ -17,13 +17,9 @@ export default function ExpiringPage() {
 
   return (
     <>
-      <PageHeader
-        eyebrow="Monitoramento"
-        title="Vencimentos"
-        description={description}
-      />
+      <PageHeader title="Vencimentos" description={description} />
 
-      <div className="rounded-md border border-[hsl(var(--hairline))] bg-background">
+      <div className="rounded-md border border-border bg-background">
         {isLoading && !data ? (
           <div className="space-y-2 p-6">
             {Array.from({ length: 5 }).map((_, i) => (

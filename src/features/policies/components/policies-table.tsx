@@ -70,7 +70,7 @@ export function PoliciesTable({ policies, onDelete }: PoliciesTableProps) {
             </TableCell>
             <TableCell className="whitespace-nowrap text-xs text-muted-foreground">
               {formatISODate(policy.coverageStart)}
-              <span className="mx-1.5 text-muted-foreground/50">–</span>
+              <span className="mx-1.5 text-muted-foreground/70">a</span>
               {formatISODate(policy.coverageEnd)}
             </TableCell>
             <TableCell>

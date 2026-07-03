@@ -263,7 +263,7 @@ export function PolicyForm({ mode, initial }: PolicyFormProps) {
                       </Select>
                       <FormDescription>
                         {isTerminal
-                          ? `${initial.status} é um estado terminal — não pode ser alterado.`
+                          ? `${initial.status} é um estado terminal e não pode ser alterado.`
                           : "Cancelada e Expirada são estados terminais."}
                       </FormDescription>
                       <FormMessage />

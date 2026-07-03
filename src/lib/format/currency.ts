@@ -7,7 +7,7 @@ const brl = new Intl.NumberFormat("pt-BR", {
 
 export function formatCurrencyBRL(value: number | string): string {
   const n = typeof value === "string" ? Number(value) : value;
-  if (!Number.isFinite(n)) return "—";
+  if (!Number.isFinite(n)) return "";
   return brl.format(n);
 }
 

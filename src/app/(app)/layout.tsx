@@ -12,7 +12,7 @@ export default function AppLayout({
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar />
         <main className="flex-1 overflow-x-hidden px-4 py-8 md:px-10 lg:px-14">
-          <div className="mx-auto w-full max-w-6xl space-y-10 animate-fade-in">
+          <div className="mx-auto w-full max-w-6xl space-y-8">
             {children}
           </div>
         </main>

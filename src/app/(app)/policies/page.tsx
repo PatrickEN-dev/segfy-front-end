@@ -57,11 +57,10 @@ function PoliciesPageFallback() {
   return (
     <>
       <PageHeader
-        eyebrow="Cadastro"
         title="Apólices"
-        description="Cadastro completo de apólices de seguro automóvel."
+        description="Cadastro de apólices de seguro automóvel."
       />
-      <div className="rounded-md border border-[hsl(var(--hairline))] bg-background">
+      <div className="rounded-md border border-border bg-background">
         <div className="space-y-2 p-6">
           {Array.from({ length: 6 }).map((_, i) => (
             <Skeleton key={i} className="h-10 w-full" />
@@ -199,9 +198,8 @@ function PoliciesPageInner() {
   return (
     <>
       <PageHeader
-        eyebrow="Cadastro"
         title="Apólices"
-        description="Cadastro completo de apólices de seguro automóvel."
+        description="Cadastro de apólices de seguro automóvel."
         actions={
           <Button asChild>
             <Link href="/policies/new">Nova apólice</Link>
@@ -209,7 +207,7 @@ function PoliciesPageInner() {
         }
       />
 
-      <div className="rounded-md border border-[hsl(var(--hairline))] bg-background">
+      <div className="rounded-md border border-border bg-background">
         <PoliciesToolbar
           search={searchInput}
           status={status}

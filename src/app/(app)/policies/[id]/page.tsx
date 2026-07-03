@@ -22,7 +22,6 @@ export default function PolicyDetailPage({
   return (
     <>
       <PageHeader
-        eyebrow="Apólice"
         title={data ? data.number : "Detalhes da apólice"}
         description={
           data ? undefined : "Carregando informações da apólice."

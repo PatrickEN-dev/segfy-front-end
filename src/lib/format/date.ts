@@ -7,13 +7,13 @@ export function toISODate(date: Date): string {
 
 export function formatISODate(iso: string): string {
   const d = parseISO(iso);
-  if (!isValid(d)) return "—";
+  if (!isValid(d)) return "";
   return format(d, "dd/MM/yyyy", { locale: ptBR });
 }
 
 export function formatISODateTime(iso: string): string {
   const d = parseISO(iso);
-  if (!isValid(d)) return "—";
+  if (!isValid(d)) return "";
   return format(d, "dd/MM/yyyy HH:mm", { locale: ptBR });
 }
 

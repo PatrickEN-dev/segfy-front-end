@@ -24,7 +24,7 @@ export function Pagination({
   return (
     <div className="flex flex-col items-center justify-between gap-2 border-t px-4 py-3 text-sm text-muted-foreground sm:flex-row">
       <span>
-        Mostrando <strong className="text-foreground">{from}</strong>–
+        Mostrando <strong className="text-foreground">{from}</strong> a{" "}
         <strong className="text-foreground">{to}</strong> de{" "}
         <strong className="text-foreground">{total}</strong>
       </span>
